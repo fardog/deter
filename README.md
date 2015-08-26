@@ -56,9 +56,9 @@ Apache 2.0, see [LICENSE](./LICENSE) for details.
 
 [httpincoming]: https://iojs.org/api/http.html#http_http_incomingmessage
 [httpresponse]: https://iojs.org/api/http.html#http_class_http_serverresponse
-[buildstatus]: https://travis-ci.org/urbanairship/deter
+[buildstatus]: https://travis-ci.org/fardog/deter
 [npminstall]: https://www.npmjs.org/package/deter
 [jsstandard]: https://github.com/feross/standard
-[buildstatusimg]: http://img.shields.io/travis/urbanairship/deter/master.svg?style=flat-square
+[buildstatusimg]: http://img.shields.io/travis/fardog/deter/master.svg?style=flat-square
 [npminstallimg]: http://img.shields.io/npm/dm/deter.svg?style=flat-square
 [jsstandardimg]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
