@@ -1,5 +1,5 @@
 import test from 'tape'
-import {get as prop} from 'deep-property'
+import dotpath from 'dotpather'
 
 import lib from '../src'
 
@@ -107,7 +107,7 @@ test('can provide a lookup function', t => {
   const fakeReq = {
     headers: {'some-fake-header': '192.168.0.1'}
   }
-  const lookup = req => prop(req, 'headers.some-fake-header')
+  const lookup = req => dotpath('headers.some-fake-header')(req)
 
   const instance = lib({whitelist: '192.168.0.0/24'}, t.fail.bind(t), lookup)
   const route = instance(t.pass.bind(t, 'routed correctly'))

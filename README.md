@@ -52,7 +52,7 @@ function onGoodIp(req, res) {
 
 ## License
 
-MIT. See [LICENSE](./LICENSE) for details.
+Apache 2.0, see [LICENSE](./LICENSE) for details.
 
 [httpincoming]: https://iojs.org/api/http.html#http_http_incomingmessage
 [httpresponse]: https://iojs.org/api/http.html#http_class_http_serverresponse

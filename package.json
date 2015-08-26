@@ -1,6 +1,6 @@
 {
   "name": "deter",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Send a request to a default route using an IP whitelist/blacklist",
   "main": "lib/index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "arrify": "^1.0.0",
-    "deep-property": "^1.1.0",
+    "dotpather": "^0.1.4",
     "ipcheck": "^0.1.0"
   },
   "devDependencies": {
