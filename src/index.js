@@ -1,6 +1,6 @@
 import IpCheck from 'ipcheck'
 import arrayify from 'arrify'
-import {get as prop} from 'deep-property'
+import dotpath from 'dotpather'
 
 export default deter
 
@@ -40,9 +40,9 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
       if (lookup) {
         ip = lookup(req)
       } else {
-        ip = prop(req, 'connection.remoteAddress') ||
-          prop(req, 'socket.remoteAddress') ||
-          prop(req, 'connection.socket.remoteAddress')
+        ip = dotpath('connection.remoteAddress')(req) ||
+          dotpath('socket.remoteAddress')(req) ||
+          dotpath('connection.socket.remoteAddress')(req)
       }
 
       if (checks.some(check => new IpCheck(ip).match(check))) {
