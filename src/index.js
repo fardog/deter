@@ -1,10 +1,10 @@
 import IpCheck from 'ipcheck'
 import arrayify from 'arrify'
-import dotpath from 'dotpather'
+import {get as prop} from 'deep-property'
 
 export default deter
 
-function deter ({whitelist, blacklist} = {}, _defaultRoute, _lookup) {
+function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
   if (!whitelist && !blacklist) {
     throw new Error(
       'One of `whitelist` or `blacklist` are required in the options object.'
@@ -18,7 +18,6 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, _lookup) {
   const onFail = _defaultRoute || defaultRoute
   const checks = []
   const list = whitelist ? arrayify(whitelist) : arrayify(blacklist)
-  const lookup = _lookup || dotpath('connection.remoteAddress')
 
   list.forEach(ip => {
     const check = new IpCheck(ip)
@@ -36,7 +35,15 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, _lookup) {
     return doCheck
 
     function doCheck (req, res) {
-      const ip = lookup(req)
+      let ip
+
+      if (lookup) {
+        ip = lookup(req)
+      } else {
+        ip = prop(req, 'connection.remoteAddress') ||
+          prop(req, 'socket.remoteAddress') ||
+          prop(req, 'connection.socket.remoteAddress')
+      }
 
       if (checks.some(check => new IpCheck(ip).match(check))) {
         if (whitelist) {

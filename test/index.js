@@ -1,5 +1,5 @@
 import test from 'tape'
-import dotpath from 'dotpather'
+import {get as prop} from 'deep-property'
 
 import lib from '../src'
 
@@ -28,6 +28,33 @@ test('passes good ips on whitelist', t => {
   const route = instance(t.pass.bind(t, 'routed correctly'))
 
   route(fakeReq, {})
+})
+
+test('can lookup in multiple places', t => {
+  t.plan(3)
+
+  const fakeReqs = [
+    {
+      connection: {remoteAddress: '192.168.0.1'}
+    },
+    {
+      connection: {
+        socket: {
+          remoteAddress: '192.168.0.1'
+        }
+      }
+    },
+    {
+      socket: {
+        remoteAddress: '192.168.0.1'
+      }
+    }
+  ]
+
+  const instance = lib({whitelist: '192.168.0.0/24'}, t.fail.bind(t))
+  const route = instance(t.pass.bind(t, 'routed correctly'))
+
+  fakeReqs.forEach(req => route(req, {}))
 })
 
 test('fails bad ips on whitelist', t => {
@@ -80,7 +107,7 @@ test('can provide a lookup function', t => {
   const fakeReq = {
     headers: {'some-fake-header': '192.168.0.1'}
   }
-  const lookup = dotpath('headers.some-fake-header')
+  const lookup = req => prop(req, 'headers.some-fake-header')
 
   const instance = lib({whitelist: '192.168.0.0/24'}, t.fail.bind(t), lookup)
   const route = instance(t.pass.bind(t, 'routed correctly'))
