@@ -30,6 +30,18 @@ test('passes good ips on whitelist', t => {
   route(fakeReq, {})
 })
 
+test('fails bad ips on blacklist', t => {
+  t.plan(1)
+
+  const fakeReq = {
+    connection: {remoteAddress: '192.168.0.1'}
+  }
+  const instance = lib({blacklist: '192.168.0.0/24'}, t.pass.bind(t, 'passed'))
+  const route = instance(t.fail.bind(t, 'routed incorrectly'))
+
+  route(fakeReq, {})
+})
+
 test('can lookup in multiple places', t => {
   t.plan(3)
 
@@ -65,6 +77,18 @@ test('fails bad ips on whitelist', t => {
   }
   const instance = lib({whitelist: '192.168.0.0/24'}, t.pass.bind(t, 'routed'))
   const route = instance(t.fail.bind(t, 'routed incorrectly'))
+
+  route(fakeReq, {})
+})
+
+test('passes good ips on blacklist', t => {
+  t.plan(1)
+
+  const fakeReq = {
+    connection: {remoteAddress: '192.168.1.1'}
+  }
+  const instance = lib({blacklist: '192.168.0.0/24'}, t.fail.bind(t))
+  const route = instance(t.pass.bind(t, 'routed correctly'))
 
   route(fakeReq, {})
 })
