@@ -1,6 +1,6 @@
 {
   "name": "deter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Send a request to a default route using an IP whitelist/blacklist",
   "main": "lib/index.js",
   "scripts": {
