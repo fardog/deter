@@ -43,7 +43,7 @@ test('fails bad ips on blacklist', t => {
 })
 
 test('can lookup in multiple places', t => {
-  t.plan(3)
+  t.plan(4)
 
   const fakeReqs = [
     {
@@ -60,6 +60,9 @@ test('can lookup in multiple places', t => {
       socket: {
         remoteAddress: '192.168.0.1'
       }
+    },
+    {
+      remoteAddress: '192.168.0.1'
     }
   ]
 

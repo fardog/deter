@@ -42,7 +42,8 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
       } else {
         ip = dotpath('connection.remoteAddress')(req) ||
           dotpath('socket.remoteAddress')(req) ||
-          dotpath('connection.socket.remoteAddress')(req)
+          dotpath('connection.socket.remoteAddress')(req) ||
+          dotpath('remoteAddress')(req)
       }
 
       if (checks.some(check => new IpCheck(ip).match(check))) {
