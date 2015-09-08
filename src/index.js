@@ -4,7 +4,7 @@ import dotpath from 'dotpather'
 
 export default deter
 
-function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
+function deter ({whitelist, blacklist} = {}, onFail, lookup) {
   if (!whitelist && !blacklist) {
     throw new Error(
       'One of `whitelist` or `blacklist` are required in the options object.'
@@ -15,7 +15,12 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
     )
   }
 
-  const onFail = _defaultRoute || defaultRoute
+  if (!onFail) {
+    throw new Error(
+      'You must pass a route to be used when a route fails the filter'
+    )
+  }
+
   const checks = []
   const list = whitelist ? arrayify(whitelist) : arrayify(blacklist)
 
@@ -34,7 +39,8 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
   function checkRoute (route) {
     return doCheck
 
-    function doCheck (req, res) {
+    function doCheck (...args) {
+      const req = args[0]
       let ip
 
       if (lookup) {
@@ -48,24 +54,17 @@ function deter ({whitelist, blacklist} = {}, _defaultRoute, lookup) {
 
       if (checks.some(check => new IpCheck(ip).match(check))) {
         if (whitelist) {
-          return route(req, res)
+          return route(...args)
         }
 
-        return onFail(req, res)
+        return onFail(...args)
       }
 
       if (whitelist) {
-        return onFail(req, res)
+        return onFail(...args)
       }
 
-      return route(req, res)
+      return route(...args)
     }
   }
-}
-
-deter.defaultRoute = defaultRoute
-
-function defaultRoute (req, res) {
-  res.statusCode = 403
-  res.end()
 }
