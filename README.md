@@ -37,9 +37,9 @@ function onGoodIp(req, res) {
   can choose a whitelist or a blacklist, but not both:
     - `whitelist` (array) a list of CIDR strings that should be allowed through
     - `blacklist` (array) a list of CIDR strings that should be denied
-- `defaultRoute` (optional, function) a route to be processed if a request fails
-  the whitelist/blacklist. If this is not provided, a 403 will be sent to a
-  failed route.
+- `onFail` (function) a route to be processed if a request fails the
+  whitelist/blacklist. It will be passed all parameters sent through the route
+  when called on failure.
 - `lookup` (optional, function) a lookup function that gets the IP address from
   the request object; by default, this looks at any place the node http server
   might put an address (see the section on addresses for details). If you need
@@ -52,15 +52,18 @@ function onGoodIp(req, res) {
 - If you provide an invalid IP or CIDR in the whitelist/blacklist, the
   constructor will `throw`; if this is a problem for you, be sure to `try/catch`
 - ipv6 is supported, including CIDR notation
-- `deter` expects to route on a message whose first parameter is a
-  [`http.IncomingMessage`][httpincoming], and the second parameter is a
-  [`http.ServerResponse`][httpresponse], conforming to the node.js HTTP/HTTPS
-  servers.
+- `deter` expects to route on a message whose first parameter is either a
+  [`http.IncomingMessage`][httpincoming] or a [`net.Socket`][socket], conforming
+  to the node.js HTTP/HTTPS and socket servers. It does not care what any of the
+  other parameters are, and will pass them through to your route/failure
+  function.
 - Deter looks for addresses in the following places, which should cover all of
-  the major node versions:
+  the major node versions; you should be able to pass it your
+  [request][httpincoming] or [socket][socket] and have the right thing occur:
     - `request.connection.remoteAddress`
     - `request.socket.remoteAddress`
     - `request.connection.socket.remoteAddress`
+    - `socket.remoteAddress`
 
 If you need to look elsewhere for an address: don't fret, just provide your own
 lookup function:
@@ -88,7 +91,7 @@ function lookup(req) {
 Apache 2.0, see [LICENSE](./LICENSE) for details.
 
 [httpincoming]: https://iojs.org/api/http.html#http_http_incomingmessage
-[httpresponse]: https://iojs.org/api/http.html#http_class_http_serverresponse
+[socket]: https://iojs.org/api/net.html#net_class_net_socket
 [buildstatus]: https://travis-ci.org/fardog/deter
 [npminstall]: https://www.npmjs.org/package/deter
 [jsstandard]: https://github.com/feross/standard

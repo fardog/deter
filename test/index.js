@@ -4,18 +4,19 @@ import dotpath from 'dotpather'
 import lib from '../src'
 
 test('throws on incorrect params', t => {
-  t.plan(3)
+  t.plan(4)
 
   t.throws(() => lib(), 'throws on no params')
-  t.throws(() => lib({whitelist: [], blacklist: []}), 'throws on black+white')
-  t.throws(() => lib({whitelist: 'bup'}), 'throws on bad ip')
+  t.throws(() => lib({whitelist: [], blacklist: []}, noop), 'throws on black+white')
+  t.throws(() => lib({whitelist: 'bup'}, noop), 'throws on bad ip')
+  t.throws(() => lib({whitelist: 'bup'}), 'throws no failure route')
 })
 
 test('does not throw on good params', t => {
   t.plan(2)
 
-  t.doesNotThrow(() => lib({whitelist: '127.0.0.1'}), 'allows good ips')
-  t.doesNotThrow(() => lib({blacklist: '127.0.0.0/24'}), 'allows good ips')
+  t.doesNotThrow(() => lib({whitelist: '127.0.0.1'}, noop), 'allows good ips')
+  t.doesNotThrow(() => lib({blacklist: '127.0.0.0/24'}, noop), 'allows good ips')
 })
 
 test('passes good ips on whitelist', t => {
@@ -109,25 +110,6 @@ test('can specify multiple addresses', t => {
   route(fakeReq, {})
 })
 
-test('will 403 if no default provided', t => {
-  t.plan(1)
-
-  const fakeReq = {
-    connection: {remoteAddress: '192.168.1.1'}
-  }
-  const fakeRes = {
-    statusCode: 0,
-    end: () => {
-      t.equal(fakeRes.statusCode, 403)
-    }
-  }
-
-  const instance = lib({whitelist: '10.0.0.0/8'})
-  const route = instance(t.fail.bind(t, 'routed incorrectly'))
-
-  route(fakeReq, fakeRes)
-})
-
 test('can provide a lookup function', t => {
   t.plan(1)
 
@@ -141,3 +123,49 @@ test('can provide a lookup function', t => {
 
   route(fakeReq, {})
 })
+
+test('passes through all other params to the pass function', t => {
+  t.plan(3)
+
+  const fakeReq = {
+    connection: {remoteAddress: '192.168.0.1'}
+  }
+  const one = 'one'
+  const two = {beep: 'boop'}
+  const instance = lib({whitelist: '192.168.0.0/24'}, t.fail.bind(t))
+  const route = instance(onPass)
+
+  route(fakeReq, one, two)
+
+  function onPass (...args) {
+    t.deepEqual(args, [fakeReq, one, two])
+    // is literally the same objects...
+    t.equal(args[0], fakeReq)
+    t.equal(args[2], two)
+  }
+})
+
+test('passes through all other params to the fail function', t => {
+  t.plan(3)
+
+  const fakeReq = {
+    connection: {remoteAddress: '192.168.1.1'}
+  }
+  const one = 'one'
+  const two = {beep: 'boop'}
+  const instance = lib({whitelist: '192.168.0.0/24'}, onFail)
+  const route = instance(t.fail.bind(t, 'should not pass'))
+
+  route(fakeReq, one, two)
+
+  function onFail (...args) {
+    t.deepEqual(args, [fakeReq, one, two])
+    // is literally the same objects...
+    t.equal(args[0], fakeReq)
+    t.equal(args[2], two)
+  }
+})
+
+function noop () {
+  // nerp
+}
